@@ -50,10 +50,32 @@ module.exports = {
             const resetLink = `${process.env.FRONTEND_URL}/recovery-password/${token}`;
 
             const htmlContent = `
-            <h3>Password Recovery</h3>
-            <p>Click the following link to reset your password:</p>
-            <a href="${resetLink}">Reset Password</a>
-        `;
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Password Recovery</title>
+                </head>
+                <body style="background-color: #f7f7f7; margin: 0; padding: 0;">
+                    <div style="max-width: 600px; margin: 50px auto; padding: 30px; background-color: #ffffff; border-radius: 8px; text-align: center; font-family: Arial, sans-serif; box-shadow: 0px 0px 10px rgba(0,0,0,0.1);">
+                        <h2 style="color: #333;">Recuperar contraseña</h2>
+                        <p style="color: #666; font-size: 16px;">
+                            Hemos recibido una solicitud para restablecer tu contraseña.
+                        </p>
+                        <p style="color: #666; font-size: 16px;">
+                            Haz clic en el siguiente enlace para establecer una nueva contraseña:
+                        </p>
+                        <a href="${resetLink}" style="display: inline-block; margin-top: 20px; padding: 12px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px; font-size: 16px;">
+                            Restablecer contraseña
+                        </a>
+                        <p style="margin-top: 30px; font-size: 12px; color: #999;">
+                            Si no solicitaste este cambio, puedes ignorar este correo.
+                        </p>
+                    </div>
+                </body>
+                </html>
+
+            `;
 
             await sendEmail(user.email, "Password Recovery", htmlContent);
 
