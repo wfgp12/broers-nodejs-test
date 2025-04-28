@@ -48,7 +48,7 @@ module.exports = {
 
         try {
             let user = await User.findById(id);
-            if (!user) {
+            if (!user || !user.isActive) {
                 return res.status(404).json({
                     ok: false,
                     msg: 'User not found'
@@ -74,10 +74,10 @@ module.exports = {
                 isUpdate = true;
             }
 
-            let token = isUpdate 
-                ? await generateJWT(user._id, user.name, user.email) 
+            let token = isUpdate
+                ? await generateJWT(user._id, user.name, user.email)
                 : req.header('x-token');
-                
+
 
             await user.save();
 
@@ -104,7 +104,7 @@ module.exports = {
         try {
             const user = await User.findById(id, "name email createdAt");
 
-            if (!user) {
+            if (!user || !user.isActive) {
                 return res.status(404).json({
                     ok: false,
                     msg: "User not found"
@@ -125,7 +125,7 @@ module.exports = {
     },
     getUsers: async (req, res) => {
         try {
-            const users = await User.find({}, "name email createdAt"); 
+            const users = await User.find({isActive: true}, "name email createdAt");
             res.status(200).json({
                 ok: true,
                 users
@@ -142,14 +142,16 @@ module.exports = {
         const { id } = req.params;
         try {
             const user = await User.findById(id);
-            if (!user) {
+
+            if (!user || !user.isActive) {
                 return res.status(404).json({
                     ok: false,
-                    msg: 'User not found'
+                    msg: 'User not found or already inactive'
                 });
             }
 
-            await User.findByIdAndDelete(id);
+            user.isActive = false;
+            await user.save();
 
             res.status(200).json({
                 ok: true,
