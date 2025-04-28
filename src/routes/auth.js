@@ -26,7 +26,10 @@ router.post("/register", [
     check("confirmPassword", "Passwords do not match").custom((value, { req }) => value === req.body.password),
     fieldValidations
 ], userControllers.createUser);
-router.get("/recovery", [validateToken], authControllers.renewToken);
+router.post("/recovery", [
+    check("email", "Email is required").isEmail(),
+    fieldValidations
+], authControllers.passwordRecovery);
 router.get("/renew", [validateToken], authControllers.renewToken);
 
 module.exports = router;
