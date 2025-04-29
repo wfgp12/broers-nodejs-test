@@ -56,7 +56,7 @@ Este proyecto es una implementación de un CRUD de usuarios utilizando Node.js, 
 La documentación de la API está disponible de manera interactiva mediante Swagger. Puedes acceder a ella abriendo el siguiente enlace en tu navegador después de haber iniciado el servidor:
 
 ```bash
-http://localhost:3000/api-docs
+http://localhost:3000/api/docs
 ```
 
 Esta documentación te permite explorar todos los endpoints disponibles y sus parámetros, junto con ejemplos de respuestas y solicitudes.
