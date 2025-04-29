@@ -1,0 +1,841 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Broers Node.js Technical Test API",
+        "version": "1.0.0",
+        "description": "Documentación de la API para el test técnico de Broers."
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3000/api",
+            "description": "Servidor de desarrollo"
+        }
+    ],
+    "components": {
+        "securitySchemes": {
+            "XTokenAuth": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "x-token"
+            }
+        },
+        "schemas": {
+            "LoginRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "email",
+                    "password"
+                ]
+            },
+            "RegisterRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Juan Pérez"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "juan.perez@example.com"
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "password123"
+                    },
+                    "confirmPassword": {
+                        "type": "string",
+                        "example": "password123"
+                    }
+                },
+                "required": [
+                    "name",
+                    "email",
+                    "password",
+                    "confirmPassword"
+                ]
+            },
+            "PasswordRecoveryRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "example": "juan.perez@example.com"
+                    }
+                },
+                "required": [
+                    "email"
+                ]
+            },
+            "ChangePasswordRequest": {
+                "type": "object",
+                "properties": {
+                    "newPassword": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "newPassword"
+                ]
+            },
+            "UserResponse": {
+                "type": "object",
+                "properties": {
+                    "uid": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    }
+                }
+            },
+            "GetUserResponse": {
+                "type": "object",
+                "properties": {
+                    "uid": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "AuthSuccessResponse": {
+                "type": "object",
+                "properties": {
+                    "ok": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "token": {
+                        "type": "string"
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/UserResponse"
+                    }
+                }
+            },
+            "HTMLResponse": {
+                "type": "string",
+                "example": "<!DOCTYPE html>... (contenido HTML)"
+            },
+            "ErrorInternalResponse": {
+                "type": "object",
+                "properties": {
+                    "ok": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "msg": {
+                        "type": "string",
+                        "example": "Internal server error"
+                    }
+                }
+            },
+            "ErrorLoginResponse": {
+                "type": "object",
+                "properties": {
+                    "ok": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "msg": {
+                        "type": "string",
+                        "example": "User or password is incorrect"
+                    }
+                }
+            },
+            "ErrorUserExistResponse": {
+                "type": "object",
+                "properties": {
+                    "ok": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "msg": {
+                        "type": "string",
+                        "example": "User already exists"
+                    }
+                }
+            },
+            "InvalidTokenResponse": {
+                "type": "object",
+                "properties": {
+                    "ok": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "msg": {
+                        "type": "string",
+                        "example": "El token es inválido o ha expirado, o la nueva contraseña no es válida"
+                    }
+                }
+            },
+            "UnauthorizedError": {
+                "type": "object",
+                "properties": {
+                    "ok": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "msg": {
+                        "type": "string",
+                        "example": "Token no valid or no provided"
+                    }
+                }
+            }
+        }
+    },
+    "paths": {
+        "/auth": {
+            "post": {
+                "summary": "Iniciar sesión",
+                "description": "Permite a los usuarios iniciar sesión y obtener un token JWT",
+                "tags": [
+                    "Auth"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login exitoso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Credenciales inválidas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorLoginResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorInternalResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "summary": "Registrar un nuevo usuario",
+                "description": "Permite registrar un nuevo usuario en el sistema. No permite la creación de usuarios con el mismo correo electrónico",
+                "tags": [
+                    "Auth"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegisterRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Usuario creado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error de validación o usuario ya existe",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorUserExistResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorInternalResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/recovery": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Recover password",
+                "description": "Envía un correo electrónico con un enlace para restablecer la contraseña",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PasswordRecoveryRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Email enviado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "msg": {
+                                            "type": "string",
+                                            "example": "Email sent. Check your inbox!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Usuario no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorUserExistResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error en el servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorInternalResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/reset-password/:token": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Mostrar formulario de recuperación de contraseña",
+                "description": "Devuelve el formulario HTML donde el usuario puede restablecer su contraseña utilizando el token proporcionado.",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "required": true,
+                        "description": "Token para restablecer la contraseña",
+                        "schema": {
+                            "type": "string",
+                            "example": "example-token"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Formulario de recuperación de contraseña en HTML",
+                        "content": {
+                            "text/html": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTMLResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Restablecer la contraseña",
+                "description": "Recibe el token y la nueva contraseña del usuario para restablecer la contraseña.",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "required": true,
+                        "description": "Token para restablecer la contraseña",
+                        "schema": {
+                            "type": "string",
+                            "example": "example-token"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "newPassword": {
+                                        "type": "string",
+                                        "description": "Nueva contraseña del usuario",
+                                        "example": "newpassword123"
+                                    }
+                                },
+                                "required": [
+                                    "newPassword"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Contraseña restablecida exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "msg": {
+                                            "type": "string",
+                                            "example": "Contraseña restablecida exitosamente"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Token inválido o expirado, o la nueva contraseña no es válida",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvalidTokenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error en el servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorInternalResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/renew": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Renovar token de sesión",
+                "description": "Devuelve un nuevo token válido y los datos del usuario autenticado.",
+                "security": [
+                    {
+                        "XTokenAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Token renovado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token inválido o no enviado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnauthorizedError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Obtener todos los usuarios activos",
+                "description": "Este endpoint devuelve todos los usuarios activos de la base de datos, excluyendo los que no están activos. Solo se retornan los campos `name`, `email` y `createdAt`.",
+                "security": [
+                    {
+                        "XTokenAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Usuarios obtenidos exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "users": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Juan Pérez"
+                                                    },
+                                                    "email": {
+                                                        "type": "string",
+                                                        "example": "juan.perez@example.com"
+                                                    },
+                                                    "createdAt": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2023-04-01T15:20:00Z"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token no válido o no enviado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnauthorizedError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorInternalResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/:id": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Obtener un usuario por su ID",
+                "description": "Este endpoint recupera un usuario por su ID. Se devuelven los campos `name`, `email` y `createdAt` solo si el usuario está activo.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "ID del usuario a obtener"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "XTokenAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Usuario encontrado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/GetUserResponse"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado o no activo",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorLoginResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token no válido o no enviado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnauthorizedError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorInternalResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Actualizar los datos de un usuario",
+                "description": "Este endpoint permite actualizar el nombre y/o el correo electrónico de un usuario. Si el correo electrónico cambia, se valida que no exista otro usuario con el mismo correo.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "ID del usuario a actualizar"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Juan Pérez"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "juan.perez@example.com"
+                                    }
+                                },
+                                "additionalProperties": false
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "XTokenAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Usuario actualizado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Correo electrónico ya en uso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorUserExistResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado o no activo",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorLoginResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token no válido o no enviado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnauthorizedError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorInternalResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Desactivar un usuario",
+                "description": "Este endpoint desactiva un usuario cambiando su estado `isActive` a `false`. No elimina físicamente al usuario de la base de datos.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "ID del usuario a desactivar"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "XTokenAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Usuario desactivado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "msg": {
+                                            "type": "string",
+                                            "example": "User deleted"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado o ya inactivo",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorLoginResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token no válido o no enviado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnauthorizedError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorInternalResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

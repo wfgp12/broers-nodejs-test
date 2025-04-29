@@ -15,7 +15,7 @@ const { validateToken } = require("../middlewares/validate-token");
 
 router.post("/", [
     check("email", "Email is required").isEmail(),
-    check("password", "Password is more than 6 characters").isLength({ min: 6 }),
+    check("password", "Password is more than 6 characters").isLength({ min: 8 }),
     fieldValidations
 ], authControllers.login);
 router.post("/register", [

@@ -9,33 +9,42 @@ module.exports = {
     login: async (req, res) => {
         const { email, password } = req.body;
 
-        let user = await User.findOne({ email, isActive: true });
-        if (!user) {
-            return res.status(400).json({
-                ok: false,
-                msg: 'User or password is incorrect'
-            });
-        }
-
-        const validPassword = bcrypt.compareSync(password, user.password);
-        if (!validPassword) {
-            return res.status(400).json({
-                ok: false,
-                msg: 'User or password is incorrect'
-            });
-        }
-
-        const token = await generateJWT(user._id, user.name, user.email);
-
-        res.json({
-            ok: true,
-            token,
-            user: {
-                uid: user._id,
-                name: user.name,
-                email: user.email
+        try {
+            let user = await User.findOne({ email, isActive: true });
+            if (!user) {
+                return res.status(400).json({
+                    ok: false,
+                    msg: 'User or password is incorrect'
+                });
             }
-        });
+
+            const validPassword = bcrypt.compareSync(password, user.password);
+            if (!validPassword) {
+                return res.status(400).json({
+                    ok: false,
+                    msg: 'User or password is incorrect'
+                });
+            }
+
+            const token = await generateJWT(user._id, user.name, user.email);
+
+            res.json({
+                ok: true,
+                token,
+                user: {
+                    uid: user._id,
+                    name: user.name,
+                    email: user.email
+                }
+            });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({
+                ok: false,
+                msg: 'Internal server error'
+            });
+        }
+
     },
     passwordRecovery: async (req, res) => {
         const { email } = req.body;
@@ -47,10 +56,10 @@ module.exports = {
                     msg: 'User not found'
                 });
             }
-            
+
             const token = await generateJWT(user._id, user.name, user.email);
             const resetLink = `${process.env.FRONTEND_URL}/api/auth/reset-password/${token}`;
-            
+
             //TODO: mover template a un archivo externo
             const htmlContent = `
                 <!DOCTYPE html>
@@ -97,7 +106,6 @@ module.exports = {
     },
     showResetPasswordForm: async (req, res) => {
         const token = req.params.token;
-
 
         //TODO: mover template a un archivo externo
         const htmlContent = `
@@ -171,15 +179,15 @@ module.exports = {
             </html>
             `;
 
-            res.send(htmlContent);
-        },
-        resetPassword: async (req, res) => {
-            const { token } = req.params;
-            const { newPassword } = req.body;
-            
-            try {
-                const {uid} = jwt.verify(token, process.env.SECRET_KEY); 
-                
+        res.send(htmlContent);
+    },
+    resetPassword: async (req, res) => {
+        const { token } = req.params;
+        const { newPassword } = req.body;
+
+        try {
+            const { uid } = jwt.verify(token, process.env.SECRET_KEY);
+
             const user = await User.findById(uid);
             if (!user || !user.isActive) {
                 return res.status(400).json({
@@ -187,7 +195,7 @@ module.exports = {
                     msg: 'User not found'
                 });
             }
-            
+
             const salt = bcrypt.genSaltSync();
             user.password = bcrypt.hashSync(newPassword, salt);
 
@@ -248,15 +256,24 @@ module.exports = {
     renewToken: async (req, res) => {
         const { uid, name, email } = req.user;
 
-        const token = await generateJWT(uid, name, email);
-        res.json({
-            ok: true,
-            token,
-            user: {
-                uid,
-                name,
-                email
-            }
-        });
+        try {
+            const token = await generateJWT(uid, name, email);
+            res.json({
+                ok: true,
+                token,
+                user: {
+                    uid,
+                    name,
+                    email
+                }
+            });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({
+                ok: false,
+                msg: 'Internal server error',
+            });
+        }
+
     }
 }

@@ -1,4 +1,3 @@
-
 # Broers Nodejs Technical Test
 
 Este proyecto es una implementación de un CRUD de usuarios utilizando Node.js, Express y MongoDB, con un sistema de autenticación basado en JWT. Además, incluye funcionalidades como la recuperación de contraseña vía correo electrónico y una semilla de usuarios de prueba.
@@ -51,6 +50,16 @@ Este proyecto es una implementación de un CRUD de usuarios utilizando Node.js, 
   ```bash
   npm run seed
   ```
+
+## Documentación de la API
+
+La documentación de la API está disponible de manera interactiva mediante Swagger. Puedes acceder a ella abriendo el siguiente enlace en tu navegador después de haber iniciado el servidor:
+
+```bash
+http://localhost:3000/api-docs
+```
+
+Esta documentación te permite explorar todos los endpoints disponibles y sus parámetros, junto con ejemplos de respuestas y solicitudes.
 
 ## Endpoints principales
 

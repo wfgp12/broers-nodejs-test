@@ -26,7 +26,6 @@ module.exports = {
 
             res.status(201).json({
                 ok: true,
-                msg: 'User was created',
                 token,
                 user: {
                     uid: user._id,
@@ -38,7 +37,7 @@ module.exports = {
             console.error(error);
             res.status(500).json({
                 ok: false,
-                msg: 'Error creating user',
+                msg: 'Internal server error'
             });
         }
     },
@@ -83,7 +82,6 @@ module.exports = {
 
             res.json({
                 ok: true,
-                msg: 'User updated',
                 user: {
                     uid: user._id,
                     name: user.name,
@@ -95,7 +93,7 @@ module.exports = {
             console.error(error);
             res.status(500).json({
                 ok: false,
-                msg: 'Error updating user',
+                msg: 'Internal server error'
             });
         }
     },
@@ -119,7 +117,7 @@ module.exports = {
             console.error(error);
             res.status(500).json({
                 ok: false,
-                msg: "Error fetching user"
+                msg: "Internal server error"
             });
         }
     },
@@ -134,7 +132,7 @@ module.exports = {
             console.error(error);
             res.status(500).json({
                 ok: false,
-                msg: "Error fetching users"
+                msg: "Internal server error"
             });
         }
     },
@@ -161,7 +159,7 @@ module.exports = {
             console.error(error);
             res.status(500).json({
                 ok: false,
-                msg: 'Error deleting user',
+                msg: 'Internal server error'
             });
         }
     }
